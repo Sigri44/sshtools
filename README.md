@@ -94,6 +94,12 @@ alias sshc="/usr/bin/ssh"
 ```bash
 source ~/.bashrc  # or source ~/.zshrc
 ```
+4. SSH your server:
+```bash
+ssh your_server
+```
+
+Note : Add your server to your ssh_config.
 
 ## 📚 Available Commands
 
