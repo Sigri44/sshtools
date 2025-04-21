@@ -1,0 +1,97 @@
+" Basic Settings
+set nocompatible
+syntax on
+set number
+set numberwidth=5
+set signcolumn=yes
+set ruler
+set autoindent
+set showmatch
+set incsearch
+set hlsearch
+set expandtab
+set shiftwidth=4
+set tabstop=4
+set backspace=indent,eol,start
+set encoding=utf-8
+set wrap
+set cursorline
+set noshowmode
+
+" Mouse Support (Simplified)
+set mouse=a
+
+" Status Line Configuration
+set laststatus=2
+set statusline=
+set statusline+=%#PmenuSel#
+set statusline+=\ MODE:\ 
+" Show different modes with clear names
+set statusline+=%{mode()=='n'?'NORMAL':mode()=='i'?'INSERT':mode()=='v'?'VISUAL':mode()=='V'?'V-LINE':mode()=='R'?'REPLACE':''}\ 
+set statusline+=%#LineNr#
+" File name and status
+set statusline+=│\ File:\ %t\ 
+set statusline+=%{&modified?'[MODIFIED]':'[SAVED]'}\ 
+set statusline+=%#CursorColumn#
+set statusline+=%=
+" File type and position
+set statusline+=%#DiffChange#
+set statusline+=Type:\ %y\ 
+set statusline+=│\ Line:\ %l/%L\ 
+set statusline+=│\ Col:\ %c\ 
+set statusline+=│\ %p%%\ 
+
+" Colors and Theme
+set t_Co=256
+set termguicolors
+set background=dark
+
+" Modern Dark Theme
+highlight Normal guibg=#1a1b26 guifg=#a9b1d6
+highlight LineNr guifg=#444b6a
+highlight CursorLine guibg=#292e42
+highlight CursorLineNr guifg=#7aa2f7 gui=bold
+highlight SignColumn guibg=NONE
+highlight VertSplit guifg=#292e42 guibg=NONE
+highlight StatusLine guibg=#292e42 guifg=#7aa2f7 gui=NONE
+highlight StatusLineNC guibg=#292e42 guifg=#565f89 gui=NONE
+highlight Pmenu guibg=#292e42 guifg=#a9b1d6
+highlight PmenuSel guibg=#7aa2f7 guifg=#1a1b26
+highlight Search guibg=#7aa2f7 guifg=#1a1b26
+highlight MatchParen guibg=#3d59a1 guifg=#7aa2f7 gui=bold
+highlight Comment guifg=#565f89
+highlight Constant guifg=#ff9e64
+highlight String guifg=#9ece6a
+highlight Identifier guifg=#7aa2f7
+highlight Statement guifg=#bb9af7
+highlight PreProc guifg=#7dcfff
+highlight Type guifg=#2ac3de
+highlight Special guifg=#ff9e64
+highlight Error guibg=#db4b4b
+highlight Todo guibg=#e0af68 guifg=#1a1b26
+highlight DiffAdd guibg=#283b4d guifg=#a9b1d6
+highlight DiffChange guibg=#272d43 guifg=#a9b1d6
+highlight ColorColumn guibg=#292e42
+
+" File Type Detection
+filetype on
+filetype plugin on
+filetype indent on
+
+" Key Mappings (Essential ones)
+let mapleader = ","
+nnoremap <leader>w :w!<cr>
+nnoremap <leader>q :q<cr>
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
+" Buffer Navigation (Simplified)
+nnoremap <leader>b :bp<CR>
+nnoremap <leader>f :bn<CR>
+
+" File Type Specific Settings
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+autocmd FileType python setlocal ts=4 sts=4 sw=4 expandtab
+autocmd FileType javascript,html,css setlocal ts=2 sts=2 sw=2 expandtab
