@@ -342,6 +342,7 @@ motd() {
     proc_120=$(($proc*120/100))
     memfree=$(cat /proc/meminfo | grep MemFree | awk '{print $2}')
     memtotal=$(cat /proc/meminfo | grep MemTotal | awk '{print $2}')
+    memcached=$(cat /proc/meminfo | grep Cached | awk '{print $2}')
     memused=$(($memtotal-$memfree))
     memusedpercent=$(($memused*100/$memtotal))
     if [ $memusedpercent -lt 90 ]; then
@@ -461,7 +462,7 @@ motd() {
     printf "\n"
     printf "  IP Address : $public_ip ($addrip)"
     printf "\n"
-    printf "  RAM : $(($memfree/1024/1024))GB free / $(($memtotal/1024/1024))GB ($ramcolor$memusedpercent%% used$reset)"
+    printf "  RAM : $(($memfree/1024/1024))GB free / $(($memtotal/1024/1024))GB ($ramcolor$memusedpercent%% used$reset) - Cache: $(($memcached/1024/1024))GB"
     printf "\n"
     if [ $swaptotal -gt 0 ]; then
         printf "  SWAP : $(($swapfree/1024/1024))GB free / $(($swaptotal/1024/1024))GB ($swapcolor$swapusedpercent%% used$reset)"
