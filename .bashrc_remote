@@ -484,13 +484,18 @@ motd() {
 
     # Check Docker presence
     if command -v docker &> /dev/null; then
-        total_containers=$(docker ps -a --format '{{.Status}}' | wc -l)
-        healthy_containers=$(docker ps -a --format '{{.Status}}' | grep -c "healthy")
-        running_containers=$(docker ps -a --format '{{.Status}}' | grep -c "Up" | grep -v "healthy")
-        unhealthy_containers=$(docker ps -a --format '{{.Status}}' | grep -c "unhealthy")
-        stopped_containers=$(docker ps -a --format '{{.Status}}' | grep -c "Exited")
-        
-        docker_info="  Docker : ${blue}Present${reset} → ${blue}${running_containers} running${reset} (${green}${healthy_containers} healthy${reset}, ${red}${unhealthy_containers} unhealthy${reset}) - ${yellow}${stopped_containers} stopped${reset}"
+        # Vérifier les droits Docker avec un timeout
+        if timeout 2 docker info &>/dev/null; then
+            total_containers=$(timeout 2 docker ps -a --format '{{.Status}}' | wc -l)
+            healthy_containers=$(timeout 2 docker ps -a --format '{{.Status}}' | grep -c "healthy")
+            running_containers=$(timeout 2 docker ps -a --format '{{.Status}}' | grep -c "Up" | grep -v "healthy")
+            unhealthy_containers=$(timeout 2 docker ps -a --format '{{.Status}}' | grep -c "unhealthy")
+            stopped_containers=$(timeout 2 docker ps -a --format '{{.Status}}' | grep -c "Exited")
+            
+            docker_info="  Docker : ${blue}Present${reset} → ${blue}${running_containers} running${reset} (${green}${healthy_containers} healthy${reset}, ${red}${unhealthy_containers} unhealthy${reset}) - ${yellow}${stopped_containers} stopped${reset}"
+        else
+            docker_info="  Docker : ${yellow}Present (no permission)${reset}"
+        fi
     fi
 
     # Display MOTD
@@ -555,7 +560,7 @@ chelp() {
 
     ${bold}Editor Commands:${reset}
     ${bold}p / hp${reset}             : Show / hide current path in prompt
-    ${bold}vic${reset}                : Vim with local vimrc ~/.vimrc_remote
+    ${bold}vic${reset}                : Vim with local vimrc /tmp/.vimrc_remote
 
     ${bold}System Commands:${reset}
     ${bold}start/stop/restart${reset} : Service management
@@ -644,7 +649,7 @@ bind '"\e[B": history-search-forward'  # Down arrow to move forward in history
 
 # Vim with custom vimrc
 vic() {
-    $(which vim) -u ~/.vimrc_remote "$@"
+    $(which vim) -u /tmp/.vimrc_remote "$@"
 }
 export -f vic
 
@@ -1847,7 +1852,7 @@ webshare() {
     trap cleanup EXIT INT TERM
 
     # Start the Python server
-    python3 ~/.webshare.py $port &
+    python3 /tmp/webshare.py $port &
     server_pid=$!
     echo $server_pid > "$pid_file"
 

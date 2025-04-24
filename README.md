@@ -77,10 +77,10 @@ ssh() {
         REMOTE_VIMRC=$(gzip -c "$HOME/.sshtools/.vimrc_remote" | base64)
         REMOTE_WEBSHARE=$(gzip -c "$HOME/.sshtools/.webshare.py" | base64)
         /usr/bin/ssh -t $1 "
-            echo '$REMOTE_BASHRC' | base64 -d | gunzip > ~/.bashrc_remote && \
-            echo '$REMOTE_VIMRC' | base64 -d | gunzip > ~/.vimrc_remote && \
-            echo '$REMOTE_WEBSHARE' | base64 -d | gunzip > ~/.webshare.py && \
-            bash --rcfile ~/.bashrc_remote
+            echo '$REMOTE_BASHRC' | base64 -d | gunzip > /tmp/.bashrc_remote && \
+            echo '$REMOTE_VIMRC' | base64 -d | gunzip > /tmp/.vimrc_remote && \
+            echo '$REMOTE_WEBSHARE' | base64 -d | gunzip > /tmp/webshare.py && \
+            bash --rcfile /tmp/.bashrc_remote
         "
     else
         /usr/bin/ssh "$@"
