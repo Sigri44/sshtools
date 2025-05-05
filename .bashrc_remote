@@ -571,6 +571,7 @@ chelp() {
     ${bold}oomanalyser${reset}        : Execute script to analyze out of memory events
 
     ${bold}Network Commands:${reset}
+    ${bold}ips${reset}                : Show all ips informations
     ${bold}ports${reset}              : Show listening ports
     ${bold}myip${reset}               : Show public IP
     ${bold}localip${reset}            : Show local IP
@@ -1905,3 +1906,117 @@ logs() {
         fi
     fi
 }
+# Function to display all IP addresses nicely formatted
+ips() {
+    echo -e "\n${bold}Information IP de la machine :${reset}\n"
+    
+    # External IP with timeout
+    echo -e "${yellow}IP Externe :${reset}"
+    external_ip=$(curl -s --connect-timeout 3 --max-time 3 ifconfig.me 2>/dev/null)
+    if [ $? -eq 0 ] && [ -n "$external_ip" ]; then
+        echo -e "  ${blue}$external_ip${reset}\n"
+    else
+        echo -e "  ${red}Non disponible (timeout)${reset}\n"
+    fi
+    
+    # Local IPs
+    echo -e "${yellow}IPs Locales :${reset}"
+    if command -v ip >/dev/null 2>&1; then
+        # Using ip command (modern systems)
+        ip -o addr show | grep 'inet ' | while read -r line; do
+            interface=$(echo $line | awk '{print $2}')
+            ip_addr=$(echo $line | awk '{print $4}')
+            
+            # Get gateway for this interface
+            gateway=$(ip route show dev $interface | grep -E '^default' | awk '{print $3}' 2>/dev/null)
+            if [ -n "$gateway" ]; then
+                echo -e "  ${green}$interface${reset}: ${blue}$ip_addr${reset} (${white}$gateway${reset})"
+            else
+                echo -e "  ${green}$interface${reset}: ${blue}$ip_addr${reset}"
+            fi
+        done
+    else
+        # Fallback to ifconfig
+        ifconfig | grep -E "inet |inet addr:" | grep -v "127.0.0.1" | while read -r line; do
+            interface=$(echo $line | awk '{print $1}')
+            ip_addr=$(echo $line | grep -oE "inet ([0-9]{1,3}\.){3}[0-9]{1,3}" | cut -d' ' -f2)
+            
+            # Get gateway for this interface
+            gateway=$(route -n | grep "^0.0.0.0" | grep $interface | awk '{print $2}' 2>/dev/null)
+            if [ -n "$gateway" ]; then
+                echo -e "  ${green}$interface${reset}: ${blue}$ip_addr${reset} (${white}$gateway${reset})"
+            else
+                echo -e "  ${green}$interface${reset}: ${blue}$ip_addr${reset}"
+            fi
+        done
+    fi
+    
+    # IPv6 addresses
+    echo -e "\n${yellow}IPs IPv6 :${reset}"
+    if command -v ip >/dev/null 2>&1; then
+        ip -o addr show | grep 'inet6 ' | while read -r line; do
+            interface=$(echo $line | awk '{print $2}')
+            ipv6_addr=$(echo $line | awk '{print $4}')
+            
+            # Get IPv6 gateway for this interface
+            gateway6=$(ip -6 route show dev $interface | grep -E '^default' | awk '{print $3}' 2>/dev/null)
+            if [ -n "$gateway6" ]; then
+                echo -e "  ${green}$interface${reset}: ${purple}$ipv6_addr${reset} (${white}$gateway6${reset})"
+            else
+                echo -e "  ${green}$interface${reset}: ${purple}$ipv6_addr${reset}"
+            fi
+        done
+    else
+        ifconfig | grep -E "inet6 |inet6 addr:" | grep -v "::1" | while read -r line; do
+            interface=$(echo $line | awk '{print $1}')
+            ipv6_addr=$(echo $line | grep -oE "inet6 [0-9a-fA-F:]{3,}" | cut -d' ' -f2)
+            
+            # Get IPv6 gateway for this interface
+            gateway6=$(route -A inet6 | grep "^default" | grep $interface | awk '{print $2}' 2>/dev/null)
+            if [ -n "$gateway6" ]; then
+                echo -e "  ${green}$interface${reset}: ${purple}$ipv6_addr${reset} (${white}$gateway6${reset})"
+            else
+                echo -e "  ${green}$interface${reset}: ${purple}$ipv6_addr${reset}"
+            fi
+        done
+    fi
+
+    # DNS Information
+    echo -e "\n${yellow}Serveurs DNS :${reset}"
+    if [ -f /etc/resolv.conf ]; then
+        # Primary DNS servers from resolv.conf
+        while read -r line; do
+            if [[ $line =~ ^nameserver ]]; then
+                dns_server=$(echo $line | awk '{print $2}')
+                # Test if it's an IPv6 address
+                if [[ $dns_server =~ ":" ]]; then
+                    echo -e "  ${purple}$dns_server${reset}"
+                else
+                    echo -e "  ${blue}$dns_server${reset}"
+                fi
+            fi
+        done < /etc/resolv.conf
+
+        # Search domains
+        search_domains=$(grep "^search" /etc/resolv.conf | cut -d' ' -f2-)
+        if [ -n "$search_domains" ]; then
+            echo -e "\n${yellow}Domaines de recherche :${reset}"
+            echo -e "  ${cyan}$search_domains${reset}"
+        fi
+    else
+        echo -e "  ${red}Fichier /etc/resolv.conf non trouvé${reset}"
+    fi
+
+    # Try to get systemd-resolved status if available
+    if command -v resolvectl &>/dev/null; then
+        echo -e "\n${yellow}Configuration DNS détaillée (systemd-resolved) :${reset}"
+        resolvectl status 2>/dev/null | while read -r line; do
+            if [[ $line =~ ^Global|^Link|^DNS|^Current|^DNSSEC|^DNS\ Domain ]]; then
+                echo -e "  ${grey}$line${reset}"
+            fi
+        done
+    fi
+    
+    echo ""
+}
+export -f ips
