@@ -65,7 +65,7 @@ A collection of powerful tools to enhance your SSH experience with custom config
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/PAPAMICA/sshtools.git ~/.sshtools
+git clone git@github.com:Sigri44/sshtools.git ~/.sshtools
 ```
 
 2. Add the following function to your `~/.bashrc` or `~/.zshrc`:
