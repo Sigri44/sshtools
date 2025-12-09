@@ -4,8 +4,7 @@
 
 ### Others
 ```bash
-less='less_with_color'
-tail='tail_with_color'alias ls='ls --color=auto -F'
+ls='ls --color=auto -F'
 ..='cd ..'
 ...='cd ../..'
 ....='cd ../../..'
@@ -13,7 +12,8 @@ ll='ls -lhF'
 la='ls -lhA'
 l='ls -CF'
 rm='rm -i'
-rf='rm -rfi'alias cp='cp -i'
+rf='rm -rfi'
+cp='cp -i'
 mv='mv -i'
 mkdir='mkdir -p'
 benchmark
