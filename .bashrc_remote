@@ -514,7 +514,7 @@ case "$(whoami)" in
 esac
 export PS1_USER_COLOR
 
-export PS1="\[${PS1_USER_COLOR}\]\u\[${grey}\]@\[${blue}\]\h \[${grey}\]>\[${reset}\] "
+export PS1="\[${PS1_USER_COLOR}\]\u\[${grey}\]@\[${blue}\]\h\[${yellow}\]:\w \[${grey}\]>\[${reset}\] "
 p() {
     export PS1="\[${PS1_USER_COLOR}\]\u\[${grey}\]@\[${blue}\]\h\[${yellow}\]:\w \[${grey}\]>\[${reset}\] "
 }
